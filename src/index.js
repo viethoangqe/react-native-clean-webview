@@ -69,7 +69,7 @@ export default class CleanWebView extends Component {
 
             this.setState({
               fullHtmlSource: undefined,
-              cleanHtmlSource: cleanHtml
+              cleanHtmlSource: this.props.contentOnly ? readabilityArticle.content:cleanHtml
             });
           } }
           />

@@ -41,46 +41,48 @@ export default class CleanWebView extends Component {
 
   render() {
     return (
-       <View style={ styles.scene } >
-        { this.state.fullHtmlSource &&
-        <WebView
-          style={ styles.hiddenWebView }
-          source={ {html: this.state.fullHtmlSource} }
-          onMessage={ (event) => {
-            if (!event.nativeEvent.data) {
-              if (this.props.onError) {
-                this.props.onError(new Error('Could not clean HTML'));
+      <View style={styles.scene} >
+        {this.state.fullHtmlSource &&
+          <WebView
+            style={styles.hiddenWebView}
+            source={{ html: this.state.fullHtmlSource }}
+            onMessage={(event) => {
+              if (!event.nativeEvent.data) {
+                if (this.props.onError) {
+                  this.props.onError(new Error('Could not clean HTML'));
+                }
+                return;
               }
-              return;
-            }
 
-            let readabilityArticle = JSON.parse(event.nativeEvent.data);
-            let cleanHtml = '';
+              let readabilityArticle = JSON.parse(event.nativeEvent.data);
+              let cleanHtml = '';
+              if (!readabilityArticle) {
+                return;
+              }
+              if (this.props.htmlCss) {
+                cleanHtml = cleanHtmlTemplate(this.props.htmlCss, readabilityArticle.title, readabilityArticle.content);
+              } else {
+                cleanHtml = cleanHtmlTemplate(cleanHtmlCss, readabilityArticle.title, readabilityArticle.content);
+              }
 
-            if (this.props.htmlCss) {
-              cleanHtml = cleanHtmlTemplate(this.props.htmlCss, readabilityArticle.title, readabilityArticle.content);
-            } else {
-              cleanHtml = cleanHtmlTemplate(cleanHtmlCss, readabilityArticle.title, readabilityArticle.content);
-            }
+              if (this.props.onCleaned) {
+                this.props.onCleaned(readabilityArticle, cleanHtml);
+              }
 
-            if (this.props.onCleaned) {
-              this.props.onCleaned(readabilityArticle, cleanHtml);
-            }
-
-            this.setState({
-              fullHtmlSource: undefined,
-              cleanHtmlSource: this.props.contentOnly ? readabilityArticle.content:cleanHtml
-            });
-          } }
+              this.setState({
+                fullHtmlSource: undefined,
+                cleanHtmlSource: this.props.contentOnly ? readabilityArticle.content : cleanHtml
+              });
+            }}
           />
         }
-        { this.state.cleanHtmlSource &&
-        <WebView
-          style={ styles.webView }
-          source={ {html: this.state.cleanHtmlSource, baseUrl: this.props.url} }
+        {this.state.cleanHtmlSource &&
+          <WebView
+            style={styles.webView}
+            source={{ html: this.state.cleanHtmlSource, baseUrl: this.props.url }}
           />
         }
-      </View> 
+      </View>
     );
   }
 }

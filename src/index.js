@@ -57,22 +57,26 @@ export default class CleanWebView extends Component {
               let readabilityArticle = JSON.parse(event.nativeEvent.data);
               let cleanHtml = '';
               if (!readabilityArticle) {
+                if (this.props.onCleaned) {
+                  this.props.onCleaned(null, null);
+                }
                 return;
-              }
-              if (this.props.htmlCss) {
-                cleanHtml = cleanHtmlTemplate(this.props.htmlCss, readabilityArticle.title, readabilityArticle.content);
               } else {
-                cleanHtml = cleanHtmlTemplate(cleanHtmlCss, readabilityArticle.title, readabilityArticle.content);
-              }
+                if (this.props.htmlCss) {
+                  cleanHtml = cleanHtmlTemplate(this.props.htmlCss, readabilityArticle.title, readabilityArticle.content);
+                } else {
+                  cleanHtml = cleanHtmlTemplate(cleanHtmlCss, readabilityArticle.title, readabilityArticle.content);
+                }
 
-              if (this.props.onCleaned) {
-                this.props.onCleaned(readabilityArticle, cleanHtml);
-              }
+                if (this.props.onCleaned) {
+                  this.props.onCleaned(readabilityArticle, cleanHtml);
+                }
 
-              this.setState({
-                fullHtmlSource: undefined,
-                cleanHtmlSource: this.props.contentOnly ? readabilityArticle.content : cleanHtml
-              });
+                this.setState({
+                  fullHtmlSource: undefined,
+                  cleanHtmlSource: this.props.contentOnly ? readabilityArticle.content : cleanHtml
+                });
+              }
             }}
           />
         }
